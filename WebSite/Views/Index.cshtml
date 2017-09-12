@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div ng-if="ctrl.submitted && ctrl.valid || ctrl.petsitters.length > 0 ||  ctrl.submitted && ctrl.valid && !ctrl.resultFound">
+    Search bar
+</div>
+
+<div ng-if="!ctrl.submitted ||  ctrl.submitted && !ctrl.valid ">
+    <form name="userForm" ng-submit="ctrl.submitForm(userForm.$valid)" novalidate>
+
+        <div class="form-group" ng-class="{'has-error':userForm.petCategory.$invalid && ctrl.submitted}">
+            <h4>Pet Category</h4>
+            <ui-select ng-model="ctrl.selectedPetCategory" name="petCategory" required>
+                <ui-select-match placeholder="Select a pet category in the list">
+                    <span ng-bind="$select.selected.PetCategoryName"></span>
+                </ui-select-match>
+                <ui-select-choices repeat="item in ctrl.petCategoryOptions">
+                    <span ng-bind="item.PetCategoryName"></span>
+                </ui-select-choices>
+            </ui-select>
+            <p ng-show="userForm.petCategory.$invalid && ctrl.submitted" class="help-block">
+                Please select a pet category.
+            </p>
+        </div>
+
+
+        <br />
+        <div ng-if="ctrl.selectedPetCategory.PetCategoryName =='Dog'" class="form-group" ng-class="{'has-error':userForm.petSize.$invalid && ctrl.submitted}">
+            <h4>Pet Size</h4>
+            <ui-select ng-model="ctrl.selectedPetSize" name="petSize" required >
+                <ui-select-match placeholder="Size of your pet">
+                    <span ng-bind="$select.selected.PetSizeId"></span>
+                </ui-select-match>
+                <ui-select-choices repeat="item in ctrl.petSizeOptions" >
+                    <span ng-bind="item.PetSizeId"></span>
+                </ui-select-choices>
+            </ui-select>
+            <p ng-show="userForm.petSize.$invalid && ctrl.submitted" class="help-block">
+                Please select a pet size.
+            </p>
+        </div>
+
+        <br />
+        <div class="form-group" ng-class="{'has-error':userForm.petCareOption.$invalid && ctrl.submitted}">
+            <h4>Pet Care Option</h4>
+            <ui-select ng-model="ctrl.selectedPetCareOption" name="petCareOption" required>
+                <ui-select-match placeholder="Select one pet care option">
+                    <span ng-bind="$select.selected.PetCareOptionName"></span>
+                </ui-select-match>
+                <ui-select-choices repeat="item in ctrl.petCareOption">
+                    <span ng-bind="item.PetCareOptionName"></span>
+                </ui-select-choices>
+            </ui-select>
+            <p ng-show="userForm.petCareOption.$invalid && ctrl.submitted" class="help-block">
+                Please select a pet care service.
+            </p>
+        </div>
+
+        <br />
+        <div class="form-group" ng-class="{'has-error':userForm.address.$invalid && ctrl.submitted}">
+            <h4>Location</h4>
+            <ui-select ng-model="ctrl.selectedAddress" name="address"  reset-search-input="false" required>
+                <ui-select-match placeholder="Zip Code or City">{{$select.selected.formatted_address}}</ui-select-match>
+                <ui-select-choices repeat="address in ctrl.addresses track by $index"
+                                   refresh="ctrl.refreshAddresses($select.search)"
+                                   refresh-delay="0">
+                    <div ng-bind-html="address.formatted_address | highlight: $select.search"></div>
+                </ui-select-choices>
+            </ui-select>
+            <p ng-show="userForm.address.$invalid && ctrl.submitted" class="help-block">
+                Please enter an zip code or city
+            </p>
+        </div>
+
+        <br />
+        <div class="form-group" ng-class="{'has-error':userForm.checkIn.$invalid && ctrl.submitted}">
+            <h4>Check-in & Check-out Date</h4>
+
+            <p class="input-group">
+                <input required  name="checkIn" type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="ctrl.fromDt" is-open="ctrl.fromDatePickerPopup.opened" datepicker-options="ctrl.fromDateOptions" placeholder="Check-in Date" />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="ctrl.openFromDatePicker()"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+            </p>
+            <p ng-show="userForm.checkIn.$invalid && ctrl.submitted" class="help-block">
+                Please select a check-in date
+            </p>
+            <p class="input-group" ng-class="{'has-error':userForm.checkOut.$invalid && ctrl.submitted}">
+                <input  required  name="checkOut" type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="ctrl.toDt" is-open="ctrl.toDatePickerPopup.opened" datepicker-options="ctrl.toDateOptions" placeholder="Check-out Date" />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="ctrl.openToDatePicker()"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+            </p>
+            <p ng-show="userForm.checkOut.$invalid && ctrl.submitted" class="help-block">
+                Please select a check-out date
+            </p>
+        </div>
+
+        <br />
+
+        <button type="submit" class="btn btn-primary" >Search</button>
+
+    </form>
+</div>
+
+<div ng-if="ctrl.petsitters.length > 0">
+    <h4 class="selectedTitle">You selected {{ctrl.selectedPetSize.PetSizeName}} {{ctrl.selectedPetCategory.PetCategoryName}} for {{ctrl.selectedPetCareOption.PetCareOptionName}}</h4>
+    <br />
+    <h4>Avaiable sitter(s):</h4>
+    <ul>
+        <li ng-repeat="sitter in ctrl.petsitters">{{sitter.FirstName}} {{sitter.LastName}}</li>
+
+    </ul>
+</div>
+
+<div ng-if="ctrl.submitted && ctrl.valid && !ctrl.resultFound">
+    <h4 class="selectedTitle">You selected {{ctrl.selectedPetSize.PetSizeName}} {{ctrl.selectedPetCategory.PetCategoryName}} for {{ctrl.selectedPetCareOption.PetCareOptionName}}</h4>
+    <h1>No Result Found</h1>
+</div>
+
+    @section scripts {
+        <script src="~/Scripts/petcare/home-index.js"></script>
+    }
+
+    @section css {
+        <link href="~/Content/home-index.css" rel="stylesheet" />
+    }
